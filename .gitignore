@@ -1,0 +1,24 @@
+# Compiled binaries
+terraform-provider-vscale
+terraform-provider-vscale.exe
+dist/
+
+# Local OpenTofu/Terraform configurations
+.terraform/
+.terraform.lock.hcl
+*.tfstate*
+tofurc
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Test logs and details
+scratch/
+details.txt
+more_details.txt
+*.log
+
+# IDE and local test configurations
+.idea/
+test_debian.tf
