@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     vscale = {
-      source  = "vscale/vscale"
+      source  = "clientapi/vscale"
       version = "1.0.0"
     }
   }

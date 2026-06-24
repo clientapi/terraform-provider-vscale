@@ -16,7 +16,7 @@ The provider must be configured with an API token before it can be used.
 terraform {
   required_providers {
     vscale = {
-      source  = "vscale/vscale"
+      source  = "clientapi/vscale"
       version = "1.0.0"
     }
   }
