@@ -218,19 +218,37 @@ func (c *Client) CreateSSHKey(name, key string) (*SSHKey, error) {
 		return nil, err
 	}
 
-	var keys []SSHKey
-	if err := c.do(req, &keys); err != nil {
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
 		return nil, err
 	}
-	for _, k := range keys {
-		if k.Name == name {
-			return &k, nil
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	var sshKey SSHKey
+	if err := json.Unmarshal(bodyBytes, &sshKey); err == nil && sshKey.ID != 0 {
+		return &sshKey, nil
+	}
+
+	var sshKeys []SSHKey
+	if err := json.Unmarshal(bodyBytes, &sshKeys); err == nil && len(sshKeys) > 0 {
+		for _, k := range sshKeys {
+			if k.Name == name {
+				return &k, nil
+			}
 		}
+		return &sshKeys[0], nil
 	}
-	if len(keys) > 0 {
-		return &keys[len(keys)-1], nil
-	}
-	return nil, fmt.Errorf("created key not found in response")
+
+	return nil, fmt.Errorf("failed to parse SSH key response: %s", string(bodyBytes))
 }
 
 func (c *Client) GetSSHKey(id int) (*SSHKey, error) {
